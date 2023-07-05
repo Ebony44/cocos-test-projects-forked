@@ -69,6 +69,20 @@ export class ByteBuffer
         
     }
 
+    public static toString(paramArray:Uint8Array,startIndex:number, stringLength:number) : string
+    {
+        let result:string = '';
+        if(paramArray.length < stringLength)
+        {
+            console.log('error, string length exceed param array length');
+        }
+        for (let i = startIndex; i < stringLength; i++) 
+        {
+            result += String.fromCharCode(paramArray[i]);
+        }
+        return result;
+    }
+
 
     public static CutOffSize(adjustedSize: number, paramBuffer: ByteBuffer)
     {
@@ -148,17 +162,64 @@ export class ByteBuffer
 
     }
 
+    //#region get methods for external uses
+    public getShort():number
+    {
+        let nValue:number = 0;
+        if(this._nAddPos < this._nPos + 2)
+        {
+            return nValue;
+        }
+        let first = this._ArrayByte[this._nPos];
+        let second = this._ArrayByte[this._nPos + 1];
+        nValue = ByteBuffer.ToShort(first,second);
+        
+
+        this._nPos += 2;
+        return nValue;
+    }
+    public get(paramArray:Uint8Array, offset:number, arrayLength:number ) : void
+    {
+        // let result:string = '';
+        if ( this._nAddPos < this._nPos + offset + arrayLength )
+        {
+            // console.log('error, string length exceed param array length');
+        }
+        for (let i = 0; i < arrayLength; i++) 
+        {
+            paramArray[i] = this._ArrayByte[this._nPos];
+            this._nPos++;
+        }
+        // return result;
+    }
+
+    //#endregion
 
 }
 
 
 export class PKMaker
 {
+
+    public static GetShort(paramBuffer :ByteBuffer) : number
+    {
+        let nValue:number = 0;
+        nValue = paramBuffer.getShort();
+        return nValue;
+    }
+
     public static GetString(paramBuffer :ByteBuffer) : [number,string]
     {
         let result:[number,string] = [0,''];
+
+        let stringLength = paramBuffer.getShort();
+        let tempArray = new Uint8Array(stringLength);
+        ByteBuffer.toString(tempArray,0,)
+
         return result;
     }
+
+
 }
 
 

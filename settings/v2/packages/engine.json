@@ -13,11 +13,20 @@
       "gfx-webgl2": {
         "_value": false
       },
+      "animation": {
+        "_value": true
+      },
+      "skeletal-animation": {
+        "_value": true
+      },
       "3d": {
         "_value": true
       },
       "2d": {
         "_value": true
+      },
+      "xr": {
+        "_value": false
       },
       "ui": {
         "_value": true
@@ -84,7 +93,16 @@
       "tween": {
         "_value": true
       },
+      "websocket": {
+        "_value": true
+      },
+      "websocket-server": {
+        "_value": true
+      },
       "terrain": {
+        "_value": true
+      },
+      "light-probe": {
         "_value": true
       },
       "tiled-map": {
@@ -99,11 +117,8 @@
       "marionette": {
         "_value": true
       },
-      "animation": {
-        "_value": true
-      },
-      "skeletal-animation": {
-        "_value": true
+      "custom-pipeline": {
+        "_value": false
       }
     },
     "includeModules": [
@@ -134,12 +149,14 @@
       "ui",
       "video",
       "websocket",
+      "websocket-server",
       "webview"
     ],
     "noDeprecatedFeatures": {
       "value": false,
       "version": ""
-    }
+    },
+    "flags": {}
   },
   "__version__": "1.0.7",
   "macroConfig": {
