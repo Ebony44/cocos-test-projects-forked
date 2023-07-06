@@ -102,15 +102,18 @@ export class NetworkWebSocketClientOnly extends Component {
 
     onClickWebSocket()
     {
+        let paramURL = '';
         if(this.wsTargetIPAndPort.string === '')
         {
             console.log('ip and port are empty');
-            return;
+            // ws://61.38.80.78:51234/ws
+            paramURL = 'ws://61.38.80.78:51234/ws';
+            // return;
         }
-        this.prepareWebSocket();
+        this.prepareWebSocket(paramURL);
     }
 
-    prepareWebSocket () {
+    prepareWebSocket (paramString:string) {
         const self = this;
         const websocketLabel = this.ws;
         const respLabel = this.wsStatus;
@@ -127,6 +130,14 @@ export class NetworkWebSocketClientOnly extends Component {
         // this._wsiSendBinary = new WebSocket('ws://61.38.80.78:51234/ws', []);
 
         let domainOfConnection = this.wsTargetIPAndPort.string;
+        if(paramString != '')
+        {
+            domainOfConnection = paramString;
+        }
+        else
+        {
+            console.log('param url is empty');
+        }
         this._wsiSendBinary = new WebSocket(domainOfConnection, []);
         const tempWebSocketClient = this._wsiSendBinary;
 
@@ -144,13 +155,11 @@ export class NetworkWebSocketClientOnly extends Component {
         };
 
         this._wsiSendBinary.onmessage = function (evt) {
+            console.log('[onmessage] message received from server');
             // MessageEvent
             let receiveMessageAsAB = evt.data as ArrayBuffer;
             let tempVariable = evt.data as string;
             // let tempVariable = evt.data as string;
-            
-            
-            // evt.
             
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
             // let createdBuffer = new Uint8Array(receiveMessage.byteLength);
@@ -175,7 +184,8 @@ export class NetworkWebSocketClientOnly extends Component {
             // process packet with bytebuffer
             createdBufferFromAB = new Uint8Array(createdBuffer);
             let testByteBuffer: ByteBuffer = new ByteBuffer(0,0,createdBufferFromAB,tempVariable.length);
-            self.testProcessPacket(testByteBuffer,tempVariable.length);
+            let currentPacketNumber = self.testProcessPacket(testByteBuffer,tempVariable.length);
+            respToStringLabel.string = currentPacketNumber.toString();
 
 
             // receiveMessage
@@ -217,14 +227,14 @@ WebSocket
         // this.scheduleOnce(this.sendWebSocketBinary, 1);
     }
 
-    testProcessPacket(paramBuffer:ByteBuffer, packetTotalLength:number)
+    testProcessPacket(paramBuffer:ByteBuffer, packetTotalLength:number) : number
     {
         // int -> int -> int
         // byte -> byte -> string -> string
         paramBuffer._nAddPos += packetTotalLength;
         let encryptNumber = PKMaker.GetInt(paramBuffer);
         let totalLength = PKMaker.GetInt(paramBuffer);
-        let pakcetNumber = PKMaker.GetInt(paramBuffer);
+        let packetNumber = PKMaker.GetInt(paramBuffer);
 
         let byMessageForm = PKMaker.GetByte(paramBuffer);
         let bySkip = PKMaker.GetByte(paramBuffer);
@@ -242,6 +252,8 @@ WebSocket
         let szJackpot_Photo = PKMaker.GetString(paramBuffer);
         let szJackpot_Message = PKMaker.GetString(paramBuffer);
 
+        return packetNumber;
+
 
     }
 
@@ -249,7 +261,8 @@ WebSocket
     sendWebSocketBinary () {
         let websocketLabel = this.wsStatus.node.getParent()!.getComponent(Label)!;
         if (!this._wsiSendBinary) { return; }
-        if (this._wsiSendBinary.readyState === WebSocket.OPEN){
+        if (this._wsiSendBinary.readyState === WebSocket.OPEN)
+        {
             websocketLabel.string = 'WebSocket: send binary';
             let buf = 'Hello WebSocket...!,\0 I\'m\0 a\0 binary\0 message\0.';
             // utf-16 16 byte
@@ -278,13 +291,15 @@ WebSocket
             
             //#region 
             // let sendingBuffer:ByteBuffer = new ByteBuffer(0,0,new Uint8Array(ByteBuffer.MAX_BUFFER_SIZE),ByteBuffer.MAX_BUFFER_SIZE);
-            // this.makeString(sendingBuffer,buf);
+            let sendingBuffer:ByteBuffer = 
+                new ByteBuffer(0,0,new Uint8Array(buf.length),buf.length);
+            this.makeString(sendingBuffer,buf);
             //#endregion
+            this._wsiSendBinary.send(sendingBuffer._ArrayByte.buffer);
 
 
             // this._wsiSendBinary.send(arrData.buffer);
 
-            // this._wsiSendBinary.send(sendingBuffer._ArrayByte.buffer);
         }
         else{
             let warningStr = 'send binary websocket instance wasn\'t ready...';
@@ -301,7 +316,8 @@ WebSocket
         
         let websocketLabel = this.wsStatus.node.getParent()!.getComponent(Label)!;
         if (!this._wsiSendBinary) { return; }
-        if (this._wsiSendBinary.readyState === WebSocket.OPEN){
+        if (this._wsiSendBinary.readyState === WebSocket.OPEN)
+        {
             websocketLabel.string = 'WebSocket: send binary';
             // let buf = 'Hello WebSocket中文,\0 I\'m\0 a\0 binary\0 message\0.';
             let buf = 'Hello WebSocketServer, message from sending button';
@@ -396,7 +412,7 @@ WebSocket
 
     onClickPrepare()
     {
-        this.prepareWebSocket();
+        // this.prepareWebSocket();
     }
 
     makeString(bBuffer: ByteBuffer, szText: string )

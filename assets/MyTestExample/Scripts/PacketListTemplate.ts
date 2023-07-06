@@ -263,6 +263,47 @@ export class ByteBuffer
         this._nAddPos++;
     }
 
+    // src is int
+    public putInt(src:number) 
+    {
+        if(this._nAddPos + 4 > ByteBuffer.MAX_BUFFER_SIZE)
+        {
+            return;
+        }
+        let tempBuffer = ByteBuffer.FromInt(src);
+        this._ArrayByte[this._nAddPos] = tempBuffer[0];
+        this._nAddPos++;
+
+        this._ArrayByte[this._nAddPos] = tempBuffer[1];
+        this._nAddPos++;
+        
+        this._ArrayByte[this._nAddPos] = tempBuffer[2];
+        this._nAddPos++;
+
+        this._ArrayByte[this._nAddPos] = tempBuffer[3];
+        this._nAddPos++;
+    }
+
+    // src is string, list(vector)...etc which need size as parameter
+    public put(paramArray:Array<any>, offset: number, length: number)
+    {
+        let currentLength = paramArray.length;
+        if(currentLength == 0)
+        {
+            return;
+        }
+        if(currentLength < offset+length)
+        {
+            return;
+        }
+        if(length+this._nAddPos > ByteBuffer.MAX_BUFFER_SIZE)
+        {
+            return;
+        }
+
+
+    }
+
     //#endregion
 
 }
@@ -319,7 +360,16 @@ export class PKMaker
 
     public static MakeByte(paramBuffer:ByteBuffer, nByte:number) : void
     {
-        paramBuffer.
+        paramBuffer.putByte(nByte);
+    }
+    public static MakeShort(paramBuffer:ByteBuffer, nShort:number) : void
+    {
+        paramBuffer.putShort(nShort);
+        // paramBuffer.
+    }
+    public static MakeInt(paramBuffer:ByteBuffer, nInt:number) : void
+    {
+        paramBuffer.putInt(nInt);
     }
 
 

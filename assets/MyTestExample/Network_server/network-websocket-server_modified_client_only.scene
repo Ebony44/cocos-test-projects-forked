@@ -1755,7 +1755,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "WebSocket-002_string",
+    "_name": "WebSocket-002_PacketNumber",
     "_objFlags": 0,
     "_parent": {
       "__id__": 2
@@ -1806,7 +1806,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "status",
+    "_name": "PacketNumberLabel",
     "_objFlags": 0,
     "_parent": {
       "__id__": 47
@@ -1921,7 +1921,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 161.93,
+      "width": 245.3,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -1950,7 +1950,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "WebSocket_string",
+    "_string": "WebSocket_PacketNumber",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
@@ -2600,7 +2600,7 @@
       "__id__": 68
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 70
@@ -2679,7 +2679,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "ws://61.38.80.78:51234/ws",
+    "_string": "",
     "_horizontalAlign": 0,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
@@ -2706,7 +2706,7 @@
       "__id__": 68
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 73
