@@ -91,6 +91,17 @@ export class ByteBuffer
         }
         return result;
     }
+    public static fromString(paramString:string) : Uint8Array
+    {
+        let currentLength = paramString.length;
+        // let tempArray : Array<number> = new Array(currentLength);
+        let tempArray : Uint8Array = new Uint8Array(currentLength);
+        for (let i = 0; i < currentLength; i++) 
+        {
+            tempArray[i] = paramString.charCodeAt(i);
+        }
+        return tempArray;
+    }
 
 
     public static AdjustSize(adjustedSize: number, paramBuffer: ByteBuffer)
@@ -285,7 +296,7 @@ export class ByteBuffer
     }
 
     // src is string, list(vector)...etc which need size as parameter
-    public put(paramArray:Array<any>, offset: number, length: number)
+    public putStringOrList(paramArray:Array<any>, offset: number, length: number)
     {
         let currentLength = paramArray.length;
         if(currentLength == 0)
@@ -301,6 +312,17 @@ export class ByteBuffer
             return;
         }
 
+    }
+
+    public put(paramArray:Uint8Array)
+    {
+        let currentLength = paramArray.length;
+        // if()
+        for (let i = 0; i < currentLength; i++) 
+        {
+            this._ArrayByte[this._nAddPos] = paramArray[i];
+            this._nAddPos++;
+        }
 
     }
 
@@ -370,6 +392,23 @@ export class PKMaker
     public static MakeInt(paramBuffer:ByteBuffer, nInt:number) : void
     {
         paramBuffer.putInt(nInt);
+    }
+    public static MakeString(paramBuffer:ByteBuffer, szText:string) : void
+    {
+        let tempArray = ByteBuffer.fromString(szText);
+        let currentSize = szText.length;
+        paramBuffer.putShort(currentSize);
+        paramBuffer.put(tempArray);
+
+        // ByteBuffer.GetString()
+        // paramBuffer.putInt(nInt);
+    }
+
+    public static MakeHeader(paramBuffer:ByteBuffer, encryptNumber:number, totalLength:number) : void
+    {
+        // 
+        paramBuffer.putInt(encryptNumber);
+        paramBuffer.putInt(totalLength);
     }
 
 

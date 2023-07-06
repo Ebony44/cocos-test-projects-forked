@@ -258,58 +258,59 @@ WebSocket
     }
 
 
-    sendWebSocketBinary () {
-        let websocketLabel = this.wsStatus.node.getParent()!.getComponent(Label)!;
-        if (!this._wsiSendBinary) { return; }
-        if (this._wsiSendBinary.readyState === WebSocket.OPEN)
-        {
-            websocketLabel.string = 'WebSocket: send binary';
-            let buf = 'Hello WebSocket...!,\0 I\'m\0 a\0 binary\0 message\0.';
-            // utf-16 16 byte
-            // ascii 4 byte
-            // unicode 8 byte
+    // sendWebSocketBinary () {
+    //     let websocketLabel = this.wsStatus.node.getParent()!.getComponent(Label)!;
+    //     if (!this._wsiSendBinary) { return; }
+    //     if (this._wsiSendBinary.readyState === WebSocket.OPEN)
+    //     {
+    //         websocketLabel.string = 'WebSocket: send binary';
+    //         let buf = 'Hello WebSocket...!,\0 I\'m\0 a\0 binary\0 message\0.';
+    //         // utf-16 16 byte
+    //         // ascii 4 byte
+    //         // unicode 8 byte
             
 
-            //let arrData = new Uint16Array(buf.length);
-            // let arrData = new Uint8Array(buf.length + 8);
-            let arrData = new Uint8Array(buf.length);
+    //         //let arrData = new Uint16Array(buf.length);
+    //         // let arrData = new Uint8Array(buf.length + 8);
+    //         let arrData = new Uint8Array(buf.length);
             
-            // for (let i = 8; i < buf.length; i++) 
-            for (let i = 0; i < buf.length; i++) 
-            {
-                arrData[i] = buf.charCodeAt(i);
-            }
+    //         // for (let i = 8; i < buf.length; i++) 
+    //         for (let i = 0; i < buf.length; i++) 
+    //         {
+    //             arrData[i] = buf.charCodeAt(i);
+    //         }
 
-            // for (let i = 0; i < 4; i++) 
-            // {
-            //     arrData[i] = 0;
-            // }
-            // for (let i = 4; i < 8; i++) 
-            // {
-            //     // arrData[i] = buf.length;
-            // }
+    //         // for (let i = 0; i < 4; i++) 
+    //         // {
+    //         //     arrData[i] = 0;
+    //         // }
+    //         // for (let i = 4; i < 8; i++) 
+    //         // {
+    //         //     // arrData[i] = buf.length;
+    //         // }
             
-            //#region 
-            // let sendingBuffer:ByteBuffer = new ByteBuffer(0,0,new Uint8Array(ByteBuffer.MAX_BUFFER_SIZE),ByteBuffer.MAX_BUFFER_SIZE);
-            let sendingBuffer:ByteBuffer = 
-                new ByteBuffer(0,0,new Uint8Array(buf.length),buf.length);
-            this.makeString(sendingBuffer,buf);
-            //#endregion
-            this._wsiSendBinary.send(sendingBuffer._ArrayByte.buffer);
+    //         //#region 
+    //         // let sendingBuffer:ByteBuffer = new ByteBuffer(0,0,new Uint8Array(ByteBuffer.MAX_BUFFER_SIZE),ByteBuffer.MAX_BUFFER_SIZE);
+    //         let sendingBuffer:ByteBuffer = 
+    //             new ByteBuffer(0,0,new Uint8Array(buf.length),buf.length);
+    //         this.makeString(sendingBuffer,buf);
+    //         //#endregion
+    //         // this._wsiSendBinary.send(sendingBuffer._ArrayByte.buffer);
+    //         this._wsiSendBinary.send(sendingBuffer._ArrayByte);
 
 
-            // this._wsiSendBinary.send(arrData.buffer);
+    //         // this._wsiSendBinary.send(arrData.buffer);
 
-        }
-        else{
-            let warningStr = 'send binary websocket instance wasn\'t ready...';
-            websocketLabel.string = 'WebSocket: not ready';
-            this.wsStatus.string = warningStr;
-            this.scheduleOnce(()=> {
-                this.sendWebSocketBinary();
-            }, 1);
-        }
-    }
+    //     }
+    //     else{
+    //         let warningStr = 'send binary websocket instance wasn\'t ready...';
+    //         websocketLabel.string = 'WebSocket: not ready';
+    //         this.wsStatus.string = warningStr;
+    //         this.scheduleOnce(()=> {
+    //             this.sendWebSocketBinary();
+    //         }, 1);
+    //     }
+    // }
 
     onSendAnyTextButtonClicked()
     {
@@ -350,7 +351,57 @@ WebSocket
 
 
             // this._wsiSendBinary.send(arrData.buffer);
-            this._wsiSendBinary.send(sendingByteBuffer._ArrayByte.buffer);
+            // this._wsiSendBinary.send(sendingByteBuffer._ArrayByte.buffer);
+            this._wsiSendBinary.send(sendingByteBuffer._ArrayByte);
+            // this._wsiSendBinary.send(buf);
+        }
+        else{
+            let warningStr = 'send binary websocket instance wasn\'t ready...';
+            websocketLabel.string = 'WebSocket: not ready';
+            this.wsStatus.string = warningStr;
+            // this.scheduleOnce(()=> {
+            //     this.sendWebSocketBinary();
+            // }, 1);
+        }
+
+    }
+
+    onSendAnyNumberAndStringClicked()
+    {
+        let websocketLabel = this.wsStatus.node.getParent()!.getComponent(Label)!;
+        if (!this._wsiSendBinary) { return; }
+        if (this._wsiSendBinary.readyState === WebSocket.OPEN)
+        {
+            websocketLabel.string = 'WebSocket: send binary';
+            // let buf = 'Hello WebSocket中文,\0 I\'m\0 a\0 binary\0 message\0.';
+            let buf = 'User ID';
+
+            let firstData = 3000; // price
+            let secondData = 'item desc'; // description
+            let thirdData = 50; // sale value
+
+            
+            // header length = 8
+
+            // first data length = 4
+            // second data length = secondData.length + 2
+            // third data length = 4
+            let totalLength = 8 + 4 + (secondData.length + 2) + 4;
+            let arrData = new Uint8Array(buf.length);
+            
+            let sendingByteBuffer = new ByteBuffer(0,0,new Uint8Array(totalLength),totalLength);
+            
+            PKMaker.MakeHeader(sendingByteBuffer,0,totalLength);
+            PKMaker.MakeInt(sendingByteBuffer, firstData);
+            PKMaker.MakeString(sendingByteBuffer,secondData);
+            PKMaker.MakeInt(sendingByteBuffer, thirdData);
+
+            // sendingByteBuffer._nPos = sendingByteBuffer._nAddPos;
+            // this.makeFullLength(sendingByteBuffer,totalLength);
+            // this.makeString(sendingByteBuffer,buf);
+            
+            this._wsiSendBinary.send(sendingByteBuffer._ArrayByte);
+
         }
         else{
             let warningStr = 'send binary websocket instance wasn\'t ready...';
@@ -361,6 +412,7 @@ WebSocket
             // }, 1);
         }
     }
+
     onTestTextButton()
     {
         // let buf = 'Hello WebSocket, message from sending button';
@@ -520,6 +572,14 @@ WebSocket
             0
         );
         console.log('temp int 2 is ' + tempInt_2);
+
+        let tempInt_3 = ByteBuffer.ToInt(
+            184,
+            11,
+            0,
+            0
+        );
+        console.log('temp int 3 is ' + tempInt_3);
 
 
 
