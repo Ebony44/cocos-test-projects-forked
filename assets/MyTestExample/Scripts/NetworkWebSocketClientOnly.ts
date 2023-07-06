@@ -1,6 +1,6 @@
 import { _decorator, Component, Label, assert,EditBox } from 'cc';
 import { NATIVE } from 'cc/env';
-import { ByteBuffer } from './PacketListTemplate';
+import { ByteBuffer, PKMaker } from './PacketListTemplate';
 import { Editbox } from '../../auto-test-case/dynamic/ui/editbox.test';
 const { ccclass, property } = _decorator;
 
@@ -117,6 +117,8 @@ export class NetworkWebSocketClientOnly extends Component {
         const respToStringLabel = this.wsStatusString;
         const respServerStatus = this.wsServerStatusString;
 
+        
+
         //let domainOfConnection = 'ws://localhost:9090/ws';
         //this._wsiSendBinary = new WebSocket('ws://localhost:9090/ws', []);
         
@@ -126,6 +128,7 @@ export class NetworkWebSocketClientOnly extends Component {
 
         let domainOfConnection = this.wsTargetIPAndPort.string;
         this._wsiSendBinary = new WebSocket(domainOfConnection, []);
+        const tempWebSocketClient = this._wsiSendBinary;
 
         respServerStatus.string = domainOfConnection;
         console.log('domain is ' + domainOfConnection);
@@ -161,10 +164,19 @@ export class NetworkWebSocketClientOnly extends Component {
 
                 // createdBuffer[i] = ByteBuffer.FromByte(tempVariable.charCodeAt(i));
                 createdBuffer[i] = tempVariable.charCodeAt(i);
-                console.log(i + ' item value ' + createdBuffer[i]);
-                console.log(tempVariable.charAt(i));
+                
+                // COMMENT for data........
+                // console.log(i + ' item value ' + createdBuffer[i]);
+                // console.log(tempVariable.charAt(i));
+
                 // tempVariable[i]
             }
+
+            // process packet with bytebuffer
+            createdBufferFromAB = new Uint8Array(createdBuffer);
+            let testByteBuffer: ByteBuffer = new ByteBuffer(0,0,createdBufferFromAB,tempVariable.length);
+            self.testProcessPacket(testByteBuffer,tempVariable.length);
+
 
             // receiveMessage
             // console.log('event data string is ' + evt.data as string);
@@ -178,9 +190,18 @@ export class NetworkWebSocketClientOnly extends Component {
 
         };
 
+        //#region add listener
+        // Event
+        this._wsiSendBinary.addEventListener("error",
+        (event) => 
+        {
+            // console.error("WebSocket error:", event.);
+        });
+        //#endregion
         this._wsiSendBinary.onerror = function (evt) {
-        console.log('error is ' + evt.bubbles);
-
+        console.log('there is error, ' + evt.bubbles
+        +  ' evt is  ' + evt);
+WebSocket
            websocketLabel.string = 'WebSocket: onerror'
             respLabel.string = 'Error!';
         };
@@ -193,8 +214,37 @@ export class NetworkWebSocketClientOnly extends Component {
             respLabel.string = 'client is closed!';
         };
 
-        this.scheduleOnce(this.sendWebSocketBinary, 1);
+        // this.scheduleOnce(this.sendWebSocketBinary, 1);
     }
+
+    testProcessPacket(paramBuffer:ByteBuffer, packetTotalLength:number)
+    {
+        // int -> int -> int
+        // byte -> byte -> string -> string
+        paramBuffer._nAddPos += packetTotalLength;
+        let encryptNumber = PKMaker.GetInt(paramBuffer);
+        let totalLength = PKMaker.GetInt(paramBuffer);
+        let pakcetNumber = PKMaker.GetInt(paramBuffer);
+
+        let byMessageForm = PKMaker.GetByte(paramBuffer);
+        let bySkip = PKMaker.GetByte(paramBuffer);
+        let szTitle = PKMaker.GetString(paramBuffer);
+        let szMessage = PKMaker.GetString(paramBuffer);
+
+
+        // after that, every data are zero... yet
+        // byte -> string -> string -> byte -> byte -> string -> string
+        let byokButtonAction = PKMaker.GetByte(paramBuffer);
+        let szNextScene = PKMaker.GetString(paramBuffer);
+        let szOpenUrl = PKMaker.GetString(paramBuffer);
+        let byDisconnect = PKMaker.GetByte(paramBuffer);
+        let byCloseSec = PKMaker.GetByte(paramBuffer);
+        let szJackpot_Photo = PKMaker.GetString(paramBuffer);
+        let szJackpot_Message = PKMaker.GetString(paramBuffer);
+
+
+    }
+
 
     sendWebSocketBinary () {
         let websocketLabel = this.wsStatus.node.getParent()!.getComponent(Label)!;

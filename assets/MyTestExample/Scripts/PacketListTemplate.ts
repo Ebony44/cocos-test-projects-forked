@@ -18,6 +18,15 @@ export class ByteBuffer
         // this.MAX_BUFFER_SIZE = MAX_BUFFER_SIZE;
     }
 
+    public static ToByte(byte1: number) : number
+    {
+        return +byte1;
+    }
+    public static FromByte(paramNumber: number) : number
+    {
+        return paramNumber;
+    }
+
     public static ToShort(byte1: number, byte2: number) : number
     {
         return (byte2 << 8) + byte1;
@@ -84,7 +93,7 @@ export class ByteBuffer
     }
 
 
-    public static CutOffSize(adjustedSize: number, paramBuffer: ByteBuffer)
+    public static AdjustSize(adjustedSize: number, paramBuffer: ByteBuffer)
     {
         let tempArray = new Uint8Array(adjustedSize);
         for (let i = 0; i < tempArray.length; i++) 
@@ -163,6 +172,23 @@ export class ByteBuffer
     }
 
     //#region get methods for external uses
+    public getInt():number
+    {
+        let nValue:number = 0;
+        if(this._nAddPos < this._nPos + 4)
+        {
+            return nValue;
+        }
+        let first = this._ArrayByte[this._nPos];
+        let second = this._ArrayByte[this._nPos + 1];
+        let third = this._ArrayByte[this._nPos + 2];
+        let fourth = this._ArrayByte[this._nPos + 3];
+        nValue = ByteBuffer.ToInt(first,second,third,fourth);
+        
+
+        this._nPos += 4;
+        return nValue;
+    }
     public getShort():number
     {
         let nValue:number = 0;
@@ -178,6 +204,22 @@ export class ByteBuffer
         this._nPos += 2;
         return nValue;
     }
+    public getByte():number
+    {
+        let nValue:number = 0;
+        if(this._nAddPos < this._nPos + 2)
+        {
+            return nValue;
+        }
+        let first = this._ArrayByte[this._nPos];
+        // let second = this._ArrayByte[this._nPos + 1];
+        nValue = ByteBuffer.ToByte(first);
+        
+
+        this._nPos += 1;
+        return nValue;
+    }
+
     public get(paramArray:Uint8Array, offset:number, arrayLength:number ) : void
     {
         // let result:string = '';
@@ -193,6 +235,34 @@ export class ByteBuffer
         // return result;
     }
 
+    //
+
+    // src is byte
+    public putByte(src:number) 
+    {
+        if(this._nAddPos + 1 > ByteBuffer.MAX_BUFFER_SIZE)
+        {
+            return;
+        }
+        this._ArrayByte[this._nAddPos] = src;
+        this._nAddPos++;
+    }
+
+    // src is short
+    public putShort(src:number) 
+    {
+        if(this._nAddPos + 2 > ByteBuffer.MAX_BUFFER_SIZE)
+        {
+            return;
+        }
+        let tempBuffer = ByteBuffer.FromShort(src);
+        this._ArrayByte[this._nAddPos] = tempBuffer[0];
+        this._nAddPos++;
+
+        this._ArrayByte[this._nAddPos] = tempBuffer[1];
+        this._nAddPos++;
+    }
+
     //#endregion
 
 }
@@ -200,6 +270,12 @@ export class ByteBuffer
 
 export class PKMaker
 {
+    public static GetByte(paramBuffer :ByteBuffer) : number
+    {
+        let nValue:number = 0;
+        nValue = paramBuffer.getByte();
+        return nValue;
+    }
 
     public static GetShort(paramBuffer :ByteBuffer) : number
     {
@@ -208,15 +284,42 @@ export class PKMaker
         return nValue;
     }
 
+    public static GetInt(paramBuffer :ByteBuffer) : number
+    {
+        let nValue:number = 0;
+        nValue = paramBuffer.getInt();
+        return nValue;
+    }
+
+
     public static GetString(paramBuffer :ByteBuffer) : [number,string]
     {
         let result:[number,string] = [0,''];
 
-        let stringLength = paramBuffer.getShort();
+        let stringLength = paramBuffer.getShort(); // +2 addnpos
         let tempArray = new Uint8Array(stringLength);
-        ByteBuffer.toString(tempArray,0,)
+        paramBuffer.get(tempArray,0,stringLength); // + stringlength addnpos
+
+        result[0] = stringLength;
+        result[1] = ByteBuffer.toString(tempArray,0,stringLength);
+
+        // ByteBuffer.toString(tempArray,0,)
+
 
         return result;
+    }
+
+    public static GetList(paramBuffer:ByteBuffer)
+    {
+
+    }
+
+    //
+
+
+    public static MakeByte(paramBuffer:ByteBuffer, nByte:number) : void
+    {
+        paramBuffer.
     }
 
 
