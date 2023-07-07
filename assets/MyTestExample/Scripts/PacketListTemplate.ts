@@ -369,7 +369,7 @@ export class PKMaker
     }
 
 
-    public static GetString(paramBuffer :ByteBuffer) : [number,string]
+    public static GetStringWithLength(paramBuffer :ByteBuffer) : [number,string]
     {
         let result:[number,string] = [0,''];
 
@@ -384,6 +384,10 @@ export class PKMaker
 
 
         return result;
+    }
+    public static GetString(paramBuffer :ByteBuffer) : string
+    {
+        return this.GetStringWithLength(paramBuffer)[1];
     }
 
     public static GetList(paramBuffer:ByteBuffer)
@@ -453,11 +457,29 @@ export class stUserBase
 {
     nSerial: number;
     szID: string;
+    
     constructor(nSerial:number, szID: string)
     {
         this.nSerial = nSerial;
         this.szID = szID;
     }
+
+    public set(paramBuffer:ByteBuffer): void
+    {
+        this.nSerial = PKMaker.GetByte(paramBuffer);
+        this.szID = PKMaker.GetString(paramBuffer);
+    }
+    public get(paramBuffer:ByteBuffer) : void
+    {
+        PKMaker.MakeByte(paramBuffer,this.nSerial);
+        PKMaker.MakeString(paramBuffer,this.szID);
+    }
+    public clear() : void
+    {
+        this.nSerial = 0;
+        this.szID = '';
+    }
+
 }
 
 export class stCardBase
