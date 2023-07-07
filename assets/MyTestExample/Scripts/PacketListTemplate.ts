@@ -5,7 +5,7 @@ export class ByteBuffer
     // public byte[] _ArrayByte;
     // public int MAX_BUFFER_SIZE = NETWORK_DEFINE.MAX_BUFFER_LENGTH;
 
-    _nPos: number;
+    _nPos: number; 
     _nAddPos: number;
     _ArrayByte: Uint8Array;
     static MAX_BUFFER_SIZE: number = 32768; // 32768
@@ -51,6 +51,20 @@ export class ByteBuffer
         return (byte4 << 24)+ (byte3 << 16)+ (byte2 << 8) + byte1;
         
     }
+
+    public static ToIntWithBytes(paramBytes:Uint8Array, startIndex:number):number
+    {
+        if(startIndex+3 >= paramBytes.length)
+        {
+            console.log('length is less than or equal to your parameter index, length ' + paramBytes.length);
+            return -1;
+        }
+        return this.ToInt(paramBytes[startIndex+0],
+            paramBytes[startIndex+1],
+            paramBytes[startIndex+2],
+            paramBytes[startIndex+3]);
+    }
+
     public static FromInt(paramNumber: number) : [number,number,number,number]
     {
         
@@ -377,8 +391,16 @@ export class PKMaker
 
     }
 
-    //
+    public static GetTotalSizeFromBytes(paramBytes:Uint8Array) : number
+    {
+        // from header bytes
+        let totalSize:number = 0;
+        // totalSize =  ByteBuffer.ToIntWithByes(paramBytes);
+        totalSize =  ByteBuffer.ToInt(paramBytes[4],paramBytes[5],paramBytes[6],paramBytes[7]);
+        return totalSize;
+    }
 
+    //
 
     public static MakeByte(paramBuffer:ByteBuffer, nByte:number) : void
     {
@@ -395,6 +417,8 @@ export class PKMaker
     }
     public static MakeString(paramBuffer:ByteBuffer, szText:string) : void
     {
+        //length is 2 + stringLength
+        // length of string + string length
         let tempArray = ByteBuffer.fromString(szText);
         let currentSize = szText.length;
         paramBuffer.putShort(currentSize);
@@ -406,10 +430,20 @@ export class PKMaker
 
     public static MakeHeader(paramBuffer:ByteBuffer, encryptNumber:number, totalLength:number) : void
     {
-        // 
+        // length is 4 + 4
+        // encryptnumber + total length of packets
         paramBuffer.putInt(encryptNumber);
         paramBuffer.putInt(totalLength);
     }
+
+    public static SetAddPos(paramBuffer:ByteBuffer, setValue: number)
+    {
+        paramBuffer._nAddPos = setValue;
+    }
+    // public static setNPos(paramBuffer:ByteBuffer, setValue: number)
+    // {
+    //     paramBuffer._nPos = setValue;
+    // }
 
 
 }
