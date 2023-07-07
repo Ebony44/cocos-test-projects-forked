@@ -2022,7 +2022,7 @@
     "_priority": 1073741824,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 508.76615746180966,
+    "_orthoHeight": 508.16901408450707,
     "_near": 1,
     "_far": 2000,
     "_color": {
@@ -3550,7 +3550,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "WebSocket-002_Integer",
+    "_name": "WebSocket_ReceivedMessage",
     "_objFlags": 0,
     "_parent": {
       "__id__": 2
@@ -3601,7 +3601,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "status",
+    "_name": "WebSocket_ReceivedMessage_Label",
     "_objFlags": 0,
     "_parent": {
       "__id__": 96
@@ -3716,7 +3716,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 174.18,
+      "width": 277.56,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -3745,7 +3745,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "WebSocket_integer",
+    "_string": "WebSocket_ReceivedMessage",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
@@ -3875,6 +3875,9 @@
     },
     "wsTargetIPAndPort": {
       "__id__": 79
+    },
+    "wsReceivedMsgFromServer": {
+      "__id__": 99
     },
     "_id": "56jDsxvAVOzKzXIzk0zl+9"
   },

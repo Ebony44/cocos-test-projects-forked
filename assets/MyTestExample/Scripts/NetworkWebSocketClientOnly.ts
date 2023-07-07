@@ -25,6 +25,9 @@ export class NetworkWebSocketClientOnly extends Component {
     @property({type: Label})
     public wsTargetIPAndPort: Label = null!;
 
+    @property({type: Label})
+    public wsReceivedMsgFromServer: Label = null!;
+
 
 
     // @property({type: Label})
@@ -119,6 +122,7 @@ export class NetworkWebSocketClientOnly extends Component {
         const respLabel = this.wsStatus;
         const respToStringLabel = this.wsStatusString;
         const respServerStatus = this.wsServerStatusString;
+        const respReceivedMessageFromServer = this.wsReceivedMsgFromServer;
 
         
 
@@ -167,18 +171,20 @@ export class NetworkWebSocketClientOnly extends Component {
             let createdBufferFromAB = new Uint8Array(receiveMessageAsAB);
             console.log(createdBufferFromAB);
             let createdBuffer = new Int8Array(tempVariable.length);
+
+            let receivedByteMessage = '';
             
             for (let i = 0; i < createdBuffer.length; i++)
             {
 
                 // createdBuffer[i] = ByteBuffer.FromByte(tempVariable.charCodeAt(i));
                 createdBuffer[i] = tempVariable.charCodeAt(i);
+
+                receivedByteMessage += createdBuffer[i].toString();
                 
                 // COMMENT for data........
                 // console.log(i + ' item value ' + createdBuffer[i]);
                 // console.log(tempVariable.charAt(i));
-
-                // tempVariable[i]
             }
 
             // process packet with bytebuffer
@@ -186,6 +192,8 @@ export class NetworkWebSocketClientOnly extends Component {
             let testByteBuffer: ByteBuffer = new ByteBuffer(0,0,createdBufferFromAB,tempVariable.length);
             let currentPacketNumber = self.testProcessPacket(testByteBuffer,tempVariable.length);
             respToStringLabel.string = currentPacketNumber.toString();
+
+
 
 
             // receiveMessage
@@ -197,6 +205,8 @@ export class NetworkWebSocketClientOnly extends Component {
 
             console.log('event data string is ' + receiveMessageAsAB
             + ' buffer length is ' + createdBuffer.length);
+
+            respReceivedMessageFromServer.string = receivedByteMessage;
 
         };
 
@@ -211,7 +221,7 @@ export class NetworkWebSocketClientOnly extends Component {
         this._wsiSendBinary.onerror = function (evt) {
         console.log('there is error, ' + evt.bubbles
         +  ' evt is  ' + evt);
-WebSocket
+
            websocketLabel.string = 'WebSocket: onerror'
             respLabel.string = 'Error!';
         };
@@ -231,7 +241,9 @@ WebSocket
     {
         // int -> int -> int
         // byte -> byte -> string -> string
-        paramBuffer._nAddPos += packetTotalLength;
+        // paramBuffer._nAddPos += packetTotalLength;
+        PKMaker.SetAddPos(paramBuffer,packetTotalLength);
+
         let encryptNumber = PKMaker.GetInt(paramBuffer);
         let totalLength = PKMaker.GetInt(paramBuffer);
         let packetNumber = PKMaker.GetInt(paramBuffer);
